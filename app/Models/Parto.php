@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Parto extends Model
 {
+    protected $table = 'partos';
     protected $fillable = [
         'madre_id',
         'fecha_parto',

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Animal extends Model
 {
     // Campos que se pueden asignar masivamente
+    protected $table = 'animales';
     protected $fillable = [
         'numero_identificacion',
         'nombre',
