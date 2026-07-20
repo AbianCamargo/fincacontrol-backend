@@ -61,6 +61,49 @@ class PartoController extends Controller
         return response()->json($parto->load(['madre', 'cria']), 201);
     }
 
+    // Registra la cría de un parto ya existente que no la tenía
+    public function registrarCria(Request $request, int $id)
+    {
+        $parto = Parto::find($id);
+
+        if (!$parto) {
+            return response()->json(['message' => 'Parto no encontrado.'], 404);
+        }
+
+        if ($parto->resultado !== 'vivo') {
+            return response()->json(['message' => 'Solo se puede registrar cría en partos con resultado vivo.'], 422);
+        }
+
+        if ($parto->cria_id) {
+            return response()->json(['message' => 'Este parto ya tiene una cría registrada.'], 422);
+        }
+
+        $request->validate([
+            'sexo_cria' => 'required|in:ternero,ternera',
+        ]);
+
+        $madre = Animal::find($parto->madre_id);
+
+        // Cuenta cuántas crías tiene la madre para generar el número
+        $totalCrias = Parto::where('madre_id', $madre->id)
+            ->whereNotNull('cria_id')
+            ->count();
+
+        $numeroCria = $madre->numero_identificacion . '-C' . ($totalCrias + 1);
+
+        $cria = Animal::create([
+            'numero_identificacion' => $numeroCria,
+            'sexo'                  => $request->sexo_cria,
+            'estado'                => 'activa',
+            'madre_id'              => $madre->id,
+            'fecha_nacimiento'      => $parto->fecha_parto,
+        ]);
+
+        $parto->update(['cria_id' => $cria->id]);
+
+        return response()->json($parto->load(['madre', 'cria']), 200);
+    }
+    
     // Actualiza un registro de parto
     public function update(Request $request, int $id)
     {

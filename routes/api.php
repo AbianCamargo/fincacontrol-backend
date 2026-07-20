@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Partos
     Route::get('/partos',            [PartoController::class, 'index']);
     Route::post('/partos',           [PartoController::class, 'store']);
+    Route::post('/partos/{id}/registrar-cria', [PartoController::class, 'registrarCria']);
     Route::put('/partos/{id}',       [PartoController::class, 'update']);
     Route::delete('/partos/{id}',    [PartoController::class, 'destroy']);
 
