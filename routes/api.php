@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 // Rutas públicas — no requieren autenticación
 Route::post('/login', [AuthController::class, 'login']);
 
+// Ruta temporal para crear el primer usuario admin en producción — eliminar después de usarla
+Route::post('/setup-inicial', [AuthController::class, 'setupInicial']);
+
 // Rutas protegidas — requieren token válido de Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 

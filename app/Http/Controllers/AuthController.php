@@ -55,7 +55,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    // Retorna los datos del usuario autenticado
+// Retorna los datos del usuario autenticado
     public function me(Request $request)
     {
         $user = $request->user();
@@ -66,5 +66,36 @@ class AuthController extends Controller
             'email' => $user->email,
             'rol'   => $user->rol,
         ], 200);
+    }
+
+    // Crea el primer usuario admin en producción — ruta temporal, protegida con clave secreta
+    public function setupInicial(Request $request)
+    {
+        $request->validate([
+            'clave_secreta' => 'required|string',
+            'name'          => 'required|string',
+            'email'         => 'required|email',
+            'password'      => 'required|string|min:6',
+        ]);
+
+        // Verifica la clave secreta antes de permitir la creación
+        if ($request->clave_secreta !== 'fincacontrol-setup-2026') {
+            return response()->json(['message' => 'Clave secreta incorrecta.'], 403);
+        }
+
+        // Evita crear más de un usuario con esta ruta si ya existe alguno
+        if (User::count() > 0) {
+            return response()->json(['message' => 'Ya existe al menos un usuario. Esta ruta está deshabilitada.'], 403);
+        }
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => $request->password,
+            'rol'      => 'admin',
+            'activo'   => true,
+        ]);
+
+        return response()->json(['message' => 'Usuario admin creado correctamente.', 'user' => $user], 201);
     }
 }
