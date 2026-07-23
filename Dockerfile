@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Instala dependencias del sistema necesarias para Laravel y PostgreSQL
 RUN apk add --no-cache \
